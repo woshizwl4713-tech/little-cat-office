@@ -1,0 +1,12 @@
+{
+  "passed": [
+    "HTTP push working→need_you",
+    "arrival at boss door",
+    "3D arm motion",
+    "day/night",
+    "360 camera",
+    "human entry",
+    "mobile width"
+  ],
+  "errors": []
+}

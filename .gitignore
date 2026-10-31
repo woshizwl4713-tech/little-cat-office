@@ -1,0 +1,14 @@
+node_modules/
+__pycache__/
+*.py[cod]
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+*.local.json
+app/assets/custom/
+playwright-report/
+test-results/
+TASK*
+DONE*

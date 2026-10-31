@@ -1,0 +1,9 @@
+{
+  "brand": {
+    "title": "小猫办公室",
+    "subtitle": "Little Cat Office"
+  },
+  "statusUrl": "/api/status",
+  "pollIntervalMs": 1000,
+  "offlineAfterMinutes": 5
+}
