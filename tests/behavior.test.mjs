@@ -1,0 +1,3 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {LeisurePlanner,CLIPS,sampleClip} from '../app/behavior.js';
+test('ten samples and smooth finite clips',()=>{for(const [name,keys]of Object.entries(CLIPS)){assert.equal(keys.length,10);for(let i=0;i<=100;i++)assert.ok(Number.isFinite(sampleClip(name,i/100)));}});
+test('scaled quota and exclusive climbing',()=>{const p=new LeisurePlanner(()=>.99);const members=Array.from({length:24},(_,i)=>({id:String(i),eligible:true,atDesk:true,settled:true}));for(let t=0;t<100;t++){p.step(t,members);assert.ok(p.outings.size<=5);assert.ok([...p.outings.values()].filter(o=>o.activity==='climb').length<=1);}assert.ok(p.outings.size>0);});

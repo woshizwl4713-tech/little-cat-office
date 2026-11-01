@@ -4,28 +4,27 @@ A local 3D office that turns agent status into cats working, walking, resting, a
 
 [中文](README.md) · [Quickstart](docs/QUICKSTART.md) · [Status specification](docs/STATUS_SPEC.md)
 
+## Start in three steps
+
+Requires Python 3.10+ and Node 18+ for npm (Python alone can run the server).
+
+1. **Install:** run `npm install` in the downloaded repository.
+2. **Start:** run `npm start`, then open http://127.0.0.1:8770/app/ .
+3. **Paste to your agent:** copy the instructions from the empty-office guide into AGENTS.md or your agent chat. One-click Codex, Claude Code and WorkBuddy examples are included.
+
+Paste-ready instruction:
+
+> Report your status to http://127.0.0.1:8770/api/status using a stable ID. POST JSON {"id":"my-agent","name":"My agent","state":"working","task":"Current task"} when starting, idle when done, and need_you when requesting confirmation. Send an update every 60 seconds during long tasks. Never include private content. Your first report creates a cat and desk automatically; no roster configuration is needed.
+
+```sh
+python3 scripts/catctl.py set my-agent working 'Working on a task'
+```
+
+Fresh installs show an empty office. Roster, appearance edits and last reports persist in `.local/office.sqlite3`. Restart retains them. Stale reports still display idle after the configured timeout; their original stored state is retained. `npm start -- --demo` uses isolated in-memory example cats, never real data. Without Node, use `python3 server/server.py`.
+
 | Working | Needs you |
 | --- | --- |
 | ![Working cat](docs/sync-working.png) | ![Waiting at the manager office](docs/sync-need-you.png) |
-
-## Five-minute setup
-
-Python 3.10+ required. Node 18+ is needed for npm commands and tests, not for the Python server. No paid APIs, accounts, build step, or CDN.
-
-```sh
-npm install && npm start
-# Without Node:
-python3 server/server.py
-```
-
-Open http://127.0.0.1:8770/app/ . From another terminal in the checkout:
-
-```sh
-python3 scripts/catctl.py set coder working 'Writing code' --name Orange
-python3 scripts/catctl.py set coder need_you 'Please review this' --name Orange
-```
-
-The UI polls every second. The cat walks to its destination. Send heartbeats during long tasks; five minutes without an update becomes offline. State is in memory; restart restores example agents.
 
 ## Features
 
@@ -56,7 +55,7 @@ Use OFFICE_URL for a different server, CHROME_PATH for an installed browser. CI 
 
 ## FAQ
 
-**Why offline?** No update for five minutes. Tool-start/end events are not continuous heartbeats.
+**Why offline?** No update for five minutes (idle by default; optional offline). Tool-start/end events are not continuous heartbeats.
 
 **Port unavailable?** Choose another port and update CAT_OFFICE_URL for clients.
 
@@ -71,3 +70,21 @@ Use OFFICE_URL for a different server, CHROME_PATH for an installed browser. CI 
 MIT. See [LICENSE](LICENSE), [NOTICE](NOTICE.md), [ASSETS](ASSETS.md). Three.js retains its original MIT license.
 
 一团小伦子 · 深圳市有点东西文艺创作有限公司
+
+## 名册与气泡 / Roster and bubbles
+
+See [BUBBLES_ROSTER](docs/BUBBLES_ROSTER.md) for roster editing, unreported desk seats, the three-bubble queue, full hover text, and `staleBecomes` (default `idle`). Initialize with `python3 scripts/catctl.py init --from examples/roster.example.json`. Default rosterMode is auto; manual rosters require rosterMode=manual.
+
+![24 cats, compact head labels](docs/shot_bubbles.png)
+
+本机 SSE 已支持：`GET /api/events`，无需公网；断线重连及轮询兜底。See [status specification](docs/STATUS_SPEC.md).
+
+Manage names, avatars and deletion in the Employee roster dialog. Deleted agents can rejoin by reporting again. See [onboarding and persistence](docs/ONBOARDING.md).
+
+## 行为与领导 / Behavior and leader
+
+[工位动作、80% 在岗调度、专属领导猫](docs/BEHAVIOR_LEADER.md)。可在网页名册设置唯一 role=lead；测试统计见 docs/behavior-qa.json。
+
+## 自动主 CEO 与派工 / Auto CEO and assignments
+
+明确指定的领导优先，其次按派工 from 自动识别；尚无派工时第一位上报成员暂任领导。使用 `POST /api/assign {from,to:[...],task}` 或 `catctl assign`，接收者会去经理室开约 5 秒短会后回工位。[接入与示例](docs/ASSIGNMENTS.md)。

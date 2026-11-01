@@ -1,0 +1,11 @@
+{
+  "autoCEO": true,
+  "cats": 21,
+  "meetings": [
+    "first:0",
+    "second:0"
+  ],
+  "duplicateRetryIgnored": true,
+  "completedEventsDoNotReplay": true,
+  "errors": []
+}

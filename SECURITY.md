@@ -7,3 +7,5 @@ The server caps request sizes and records, validates batches before mutation, re
 Uploaded photos are processed locally for colors and are not sent to the server. Browser appearance records are local and origin-scoped. Cross-origin pull credentials are not forwarded by the UI.
 
 If publishing this repository later, configure a private vulnerability reporting channel first. Until then, report issues directly to the project owner privately; never include live credentials or exploit details in a public issue.
+
+Private runtime database: .local/office.sqlite3. Do not commit it; task text may be sensitive. Demo mode is isolated in memory.

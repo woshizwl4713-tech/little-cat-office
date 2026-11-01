@@ -5,5 +5,8 @@
   },
   "statusUrl": "/api/status",
   "pollIntervalMs": 1000,
-  "offlineAfterMinutes": 5
+  "offlineAfterMinutes": 5,
+  "staleBecomes": "idle",
+  "rosterMode": "auto",
+  "autoLeader": true
 }

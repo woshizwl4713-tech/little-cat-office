@@ -1,0 +1,15 @@
+{
+  "cats": 24,
+  "unreportedSeated": 3,
+  "pinned": 2,
+  "maxOrdinary": 3,
+  "checks": [
+    "queue cap across frames",
+    "full hover/click text",
+    "stale idle remains available to leisure planner",
+    "unreported seats",
+    "task update",
+    "no browser errors"
+  ],
+  "errors": []
+}

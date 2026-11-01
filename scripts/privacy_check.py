@@ -3,7 +3,7 @@
 import json, re
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-SKIP={'.git','node_modules','__pycache__'}
+SKIP={'.git','node_modules','__pycache__','.local'}
 checks={
  'home_path':rb'/(?:Users|home)/[A-Za-z0-9_.-]+',
  'private_key':rb'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY',

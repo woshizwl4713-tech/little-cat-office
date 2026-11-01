@@ -3,7 +3,7 @@
 import json, sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'scripts'))
-from catctl import report
+from catctl import report, request
 
 def dispatch(req):
     method=req.get('method'); params=req.get('params',{})
@@ -11,8 +11,12 @@ def dispatch(req):
         return {'protocolVersion':'2024-11-05','capabilities':{'tools':{}},'serverInfo':{'name':'little-cat-office','version':'1.0.0'}}
     if method=='ping': return {}
     if method=='tools/list':
-        return {'tools':[{'name':'set_status','description':'Report your own office state; use need_you to request human attention.','inputSchema':{'type':'object','properties':{'id':{'type':'string'},'state':{'type':'string','enum':['working','meeting','idle','need_you','offline']},'task':{'type':'string'},'name':{'type':'string'}},'required':['id','state'],'additionalProperties':False}}]}
+        return {'tools':[{'name':'set_status','description':'Report your own office state; use need_you to request human attention.','inputSchema':{'type':'object','properties':{'id':{'type':'string'},'state':{'type':'string','enum':['working','meeting','idle','need_you','offline']},'task':{'type':'string'},'name':{'type':'string'}},'required':['id','state'],'additionalProperties':False}},{'name':'assign_task','description':'Report a task assignment to the local office so recipients meet the leader. This visualizes assignment; it does not execute the recipient task.','inputSchema':{'type':'object','properties':{'from':{'type':'string'},'to':{'type':'array','items':{'type':'string'}},'task':{'type':'string'},'id':{'type':'string'}},'required':['from','to','task'],'additionalProperties':False}}]}
     if method=='tools/call':
+        if params.get('name')=='assign_task':
+            try:value=request(params.get('arguments',{}),path='/api/assign')
+            except Exception:return {'isError':True,'content':[{'type':'text','text':'Assignment rejected or office unavailable'}]}
+            return {'content':[{'type':'text','text':json.dumps(value,ensure_ascii=False)}]}
         if params.get('name')!='set_status': raise ValueError('Unknown tool')
         a=params.get('arguments',{})
         if not isinstance(a,dict) or not isinstance(a.get('id'),str) or not a['id'] or a.get('state') not in ['working','meeting','idle','need_you','offline']: raise ValueError('Invalid arguments')

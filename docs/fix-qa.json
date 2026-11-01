@@ -1,0 +1,12 @@
+{
+  "cycles": 10,
+  "stateTransitionsChecked": 30,
+  "checks": [
+    "actual scene marker counts equal need_you cats",
+    "marker owned by animated head",
+    "marker follows movement",
+    "overlapping names suppressed",
+    "agent removal leaves zero markers"
+  ],
+  "errors": []
+}

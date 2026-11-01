@@ -15,7 +15,7 @@ class StatusTests(unittest.TestCase):
         self.assertEqual(s.snapshot()['agents'][0]['state'],'idle')
         with self.assertRaises(ValueError):s.push([{'id':'b'},{'name':'invalid'}])
         self.assertEqual(len(s.records),1)
-        now[0]+=61;self.assertEqual(s.snapshot()['agents'][0]['state'],'offline')
+        now[0]+=61;self.assertEqual(s.snapshot()['agents'][0]['state'],'idle');self.assertTrue(s.snapshot()['agents'][0]['stale'])
         s.push({'id':'a','state':'working'});self.assertEqual(s.snapshot()['agents'][0]['state'],'working')
         s.push({'id':'a','state':'idle','updatedAt':'1970-01-01T00:00:00Z'});self.assertEqual(s.records['a']['state'],'working')
     def test_invalid(self):
@@ -66,4 +66,13 @@ class HttpTests(unittest.TestCase):
         self.assertEqual(responses[1]['result']['tools'][0]['name'],'set_status')
         self.assertFalse(responses[2]['result'].get('isError',False))
         self.assertEqual(next(a for a in self.call()['agents'] if a['id']=='mcp')['state'],'need_you')
+    def test_cli_and_sdk_dispatch(self):
+        r=subprocess.run([sys.executable,str(ROOT/'scripts/catctl.py'),'assign','a,b,c','任务','--from','main','--event-id','cli-batch'],env=self.env,text=True,capture_output=True)
+        self.assertEqual(r.returncode,0,r.stderr);data=json.loads(r.stdout);self.assertEqual(len(data['assignments']),3)
+        subprocess.run(['node','--input-type=module','-e',"import {assign} from './adapters/node/index.mjs';await assign('main',['a'],'Node task',{id:'node-job'});"],cwd=ROOT,env=self.env,check=True)
+        code=f"import sys;sys.path.insert(0,{str(ROOT/'adapters/python')!r});from office import assign;assign('main',['b'],'Python task',event_id='python-job')"
+        subprocess.run([sys.executable,'-c',code],env=self.env,check=True)
+        req={'jsonrpc':'2.0','id':1,'method':'tools/call','params':{'name':'assign_task','arguments':{'from':'main','to':['c'],'task':'MCP task','id':'mcp-job'}}}
+        r=subprocess.run([sys.executable,str(ROOT/'adapters/mcp/server.py')],input=json.dumps(req)+'\n',text=True,capture_output=True,env=self.env,check=True)
+        self.assertFalse(json.loads(r.stdout)['result'].get('isError',False));self.assertEqual(len(self.call()['assignments']),6)
 if __name__=='__main__':unittest.main()

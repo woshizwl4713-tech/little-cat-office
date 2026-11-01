@@ -1,0 +1,12 @@
+{
+  "checks": [
+    "fresh startup empty",
+    "guide and 3 host snippets",
+    "catctl first report auto-discovers",
+    "UI rename/avatar",
+    "real process restart retains state and identity",
+    "UI delete persists",
+    "demo isolated from real data"
+  ],
+  "errors": []
+}

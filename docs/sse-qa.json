@@ -1,0 +1,12 @@
+{
+  "latencyMs": 24,
+  "pollIntervalMs": 60000,
+  "checks": [
+    "SSE header authenticated in Python integration test",
+    "push visible within 2 seconds without polling",
+    "fresh stream after page reload",
+    "poll fallback during SSE failure",
+    "automatic SSE reconnection"
+  ],
+  "errors": []
+}

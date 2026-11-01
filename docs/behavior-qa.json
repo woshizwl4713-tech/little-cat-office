@@ -1,0 +1,26 @@
+{
+  "wallSeconds": 300.807,
+  "cats": 25,
+  "crew": 24,
+  "samples": 298,
+  "crewAwayRatio": 0.20148762922355606,
+  "allAwayRatio": 0.20255263411601612,
+  "maxCrewAway": 5,
+  "maxAllAway": 6,
+  "maxClimbing": 1,
+  "actions": [
+    "nod",
+    "swivel",
+    "tail",
+    "stretch",
+    "coffee",
+    "papers",
+    "yawn",
+    "thinking",
+    "tumble",
+    "typing"
+  ],
+  "neighborConflicts": 0,
+  "errors": [],
+  "leaderComfortVisit": true
+}
