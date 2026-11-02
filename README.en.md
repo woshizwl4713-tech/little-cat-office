@@ -55,7 +55,7 @@ Use OFFICE_URL for a different server, CHROME_PATH for an installed browser. CI 
 
 ## FAQ
 
-**Why offline?** No update for five minutes (idle by default; optional offline). Tool-start/end events are not continuous heartbeats.
+**Why offline?** No update for 30 minutes (idle by default; optional offline). Tool-start/end events are not continuous heartbeats.
 
 **Port unavailable?** Choose another port and update CAT_OFFICE_URL for clients.
 

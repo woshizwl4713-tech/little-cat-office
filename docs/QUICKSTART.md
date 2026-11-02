@@ -15,7 +15,7 @@ python3 scripts/catctl.py set coder need_you '看我看我！需要审批！' --
 python3 scripts/catctl.py get
 ```
 
-The cat updates through local SSE, then walks to its destination. Reuse the same ID for updates; send `name` consistently (CLI defaults to ID). See [status format](STATUS_SPEC.md). Send an update at least every five minutes or the cat becomes idle. `CAT_OFFICE_URL` overrides the CLI/SDK URL. For a different port: `python3 server/server.py --port 9000` and set the client URL accordingly.
+The cat updates through local SSE, then walks to its destination. Reuse the same ID for updates; send `name` consistently (CLI defaults to ID). See [status format](STATUS_SPEC.md). Send updates before the configured timeout (30 minutes by default) or the cat becomes idle. `CAT_OFFICE_URL` overrides the CLI/SDK URL. For a different port: `python3 server/server.py --port 9000` and set the client URL accordingly.
 
 Optional authentication: set `CAT_OFFICE_TOKEN` in the server and adapter environment to the same private value. Do not commit it. The browser will ask for it. No credentials are needed for the default loopback server.
 
