@@ -1,4 +1,4 @@
-export function normalizeStatus(input,{now=Date.now(),offlineAfterMs=300000,staleBecomes='idle',roster}={}){
+export function normalizeStatus(input,{now=Date.now(),offlineAfterMs=1800000,staleBecomes='idle',roster}={}){
  if(!input||!Array.isArray(input.agents))throw Error('状态源必须包含 agents 数组');
  const seen=new Set();
  let agents=input.agents.map(a=>{

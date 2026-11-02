@@ -1,3 +1,5 @@
+import {isolatedOffice} from './isolated-office.mjs';
+const isolated=await isolatedOffice();
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
@@ -11,7 +13,7 @@ try {
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
 
-  // 0.05 min = 3s: short enough for the failure→idle assertion, long enough that a
+  // 0.05 min = 3s: short enough to test preservation beyond expiry, long enough that a
   // just-served Playwright mock is not immediately treated as stale in the page.
   await page.route('**/config.json', (route) =>
     route.fulfill({
@@ -42,7 +44,7 @@ try {
     });
   });
 
-  await page.goto((process.env.OFFICE_URL || 'http://127.0.0.1:8770') + '/app/');
+  await page.goto(isolated.url + '/app/');
 
   await page.waitForFunction(
     () => window.officeDebug?.getCats()?.some((c) => c.id === 'transport' && c.meeting === true),
@@ -51,12 +53,9 @@ try {
   );
 
   stateRef.fail = true;
-  await page.waitForFunction(
-    () => officeDebug.getCats().find((c) => c.id === 'transport')?.status === 'idle',
-    null,
-    {timeout: 60000},
-  );
-  assert.match(await page.locator('#connection').textContent(), /异常/);
+  await page.waitForTimeout(5000);
+  assert.equal(await page.evaluate(() => officeDebug.getCats().find(c => c.id === 'transport').meeting), true);
+  assert.match(await page.locator('#connection').textContent(), /服务没在运行/);
 
   stateRef.fail = false;
   stateRef.value = 'working';
@@ -67,7 +66,7 @@ try {
   );
 
   assert.deepEqual(errors, []);
-  console.log('Pull, idle expiry during failure, and recovery passed');
+  console.log('Pull, preserved state during failure, and recovery passed');
 } finally {
-  await browser.close();
+  await browser.close();await isolated.stop();
 }

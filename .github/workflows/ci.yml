@@ -20,7 +20,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Browser regression
         run: |
-          python3 server/server.py &
+          python3 server/server.py --data-dir "$(mktemp -d)" &
           SERVER_PID=$!
           trap 'kill "$SERVER_PID"' EXIT
           for attempt in $(seq 1 30); do

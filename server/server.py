@@ -73,13 +73,13 @@ def handler(store, credential='', root=ROOT):
 
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument('--port',type=int,default=8770)
-    parser.add_argument('--offline-after',type=float,default=None,help='Seconds without an update (default: config minutes or 300)' )
+    parser.add_argument('--offline-after',type=float,default=None,help='Seconds without an update (default: config minutes or 1800)' )
     parser.add_argument('--demo',action='store_true',help='Isolated in-memory example cats')
     parser.add_argument('--data-dir',default=str(ROOT/'.local'),help='Private persistent state directory')
     args=parser.parse_args()
     config_path=ROOT/'app'/'config.json'
     config=json.loads(config_path.read_text()) if config_path.exists() else {}
-    timeout=args.offline_after if args.offline_after is not None else config.get('offlineAfterMinutes',5)*60
+    timeout=args.offline_after if args.offline_after is not None else config.get('offlineAfterMinutes',30)*60
     if not isinstance(timeout,(int,float)) or timeout<=0: parser.error('Timeout must be positive')
     store=Store(timeout,stale_becomes=config.get('staleBecomes','idle'),path=None if args.demo else Path(args.data_dir)/'office.sqlite3',auto_lead=config.get('autoLeader',True))
     configured=[a for a in config.get('agents',[]) if a.get('role')=='lead']

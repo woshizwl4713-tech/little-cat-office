@@ -7,7 +7,7 @@ Name pills track the animated head. Ordinary bubbles have a FIFO queue capped at
 ## 名册 / Roster
 
 ```json
-{"agents":[{"id":"coder","name":"小橘","avatar":"cat-orange"}],"staleBecomes":"idle","offlineAfterMinutes":5}
+{"agents":[{"id":"coder","name":"小橘","avatar":"cat-orange"}],"staleBecomes":"idle","offlineAfterMinutes":30}
 ```
 
 可选高级用法：在 app/config.json 设置 rosterMode=manual 并配置 agents。配置手工名册时，名册决定哪些 bot 显示（空数组表示没有名册 bot），源里多余 ID 不显示；姓名和头像以名册为准。增删改名或换头像后刷新页面。删除 agents 字段则恢复按状态源动态发现成员。通过网页添加的人类伙伴仍作为独立本地成员显示。
@@ -18,7 +18,7 @@ In rosterMode=manual, the configured roster is authoritative, including an empty
 
 Unreported members sit at their desks without claiming real work. Reported members become idle after expiry and follow leisure behaviors. Explicit offline reports stay offline.
 
-staleBecomes 可选 idle（默认）或 offline。浏览器的 offlineAfterMinutes 默认 5；服务端默认读取同一配置，命令行 --offline-after 可覆盖超时秒数。修改服务端配置后重启服务。没有 updatedAt 的旧拉取数据无法判断超时。报告定期更新可恢复工作。
+staleBecomes 可选 idle（默认）或 offline。浏览器的 offlineAfterMinutes 默认 30；服务端默认读取同一配置，命令行 --offline-after 可覆盖超时秒数。修改服务端配置后重启服务。没有 updatedAt 的旧拉取数据无法判断超时。报告定期更新可恢复工作。
 
 ## catctl init
 

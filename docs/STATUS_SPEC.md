@@ -12,7 +12,7 @@ GET `/api/status` returns the effective states. After `--offline-after 300` seco
 
 Set server and client environment variable `CAT_OFFICE_TOKEN` for optional Bearer authentication on **both GET and POST**. Never put the value in app/config.json. When required, the browser shows “连接状态源”; the entered value stays in page memory and is sent only to the same origin. No permissive CORS. Local development HTTP is loopback-only; this is not a public multi-user server.
 
-Pull mode: set `app/config.json.statusUrl` and `pollIntervalMs`. `offlineAfterMinutes` controls expiry of timestamped pull data (default 5). Legacy records without timestamps cannot be expired reliably; they retain their state. Pull failures preserve the last good data and visibly show the error. Server expiry uses staleBecomes and reports stale=true. Keep browser and server thresholds consistent; an explicit offline report is never silently turned idle.
+Pull mode: set `app/config.json.statusUrl` and `pollIntervalMs`. `offlineAfterMinutes` controls expiry of timestamped pull data (default 30). Legacy records without timestamps cannot be expired reliably; they retain their state. Pull failures preserve the last good data and visibly show the error. Server expiry uses staleBecomes and reports stale=true. Keep browser and server thresholds consistent; an explicit offline report is never silently turned idle.
 
 Avatars: cat-grey, cat-white, cat-calico, cat-black, cat-orange. Other names use deterministic default cats. This controls 3D coat appearance, not a downloadable avatar URL.
 

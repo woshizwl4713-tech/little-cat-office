@@ -6,7 +6,7 @@
   "scripts": {
     "start": "python3 server/server.py",
     "test": "python3 -m unittest discover -s tests -p 'test_*.py' -v && node --test tests/*.test.mjs && python3 scripts/privacy_check.py",
-    "test:browser": "node tests/browser.mjs && node tests/transport.mjs && node tests/bubbles-browser.mjs && node tests/sse-browser.mjs && node tests/onboard-browser.mjs && node tests/fix-browser.mjs && node tests/lead-browser.mjs",
+    "test:browser": "node tests/browser.mjs && node tests/transport.mjs && node tests/bubbles-browser.mjs && node tests/sse-browser.mjs && node tests/onboard-browser.mjs && node tests/fix-browser.mjs && node tests/lead-browser.mjs && node tests/launcher-browser.mjs",
     "test:behavior": "node tests/behavior-browser.mjs",
     "test:assignments": "node tests/assignments-browser.mjs && node tests/group-assign-browser.mjs"
   },

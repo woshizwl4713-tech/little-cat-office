@@ -1,3 +1,5 @@
+import {isolatedOffice} from './isolated-office.mjs';
+const isolated=await isolatedOffice();
 import assert from 'node:assert/strict';import {mkdir,writeFile} from 'node:fs/promises';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
 const browser=await chromium.launch({executablePath:process.env.CHROME_PATH||undefined,headless:true});
@@ -7,7 +9,7 @@ try{
  let reports={agents:roster.slice(0,21).map((a,i)=>({...a,state:i<2?'need_you':'working',task:i<2?'看我看我！这个方案需要你审批！':'今天也在认真整理很长很长的灵感记录',updatedAt:new Date().toISOString()}))};
  await p.route('**/config.json',r=>r.fulfill({json:{rosterMode:'manual',agents:roster,statusUrl:'/bubble-fixture',pollIntervalMs:250,staleBecomes:'idle',offlineAfterMinutes:5}}));
  await p.route('**/bubble-fixture?*',r=>r.fulfill({json:reports}));
- await p.goto((process.env.OFFICE_URL||'http://127.0.0.1:8770')+'/app/');await p.waitForFunction(()=>window.officeDebug?.getCats().length===24);
+ await p.goto(isolated.url+'/app/');await p.waitForFunction(()=>window.officeDebug?.getCats().length===24);
  await p.evaluate(()=>officeDebug.setView({target:[3,1,8],viewAngle:.30,viewHeight:25,camRadius:43,zoom:1}));
  const pending=await p.evaluate(()=>officeDebug.getState().agents.filter(a=>a.rosterPending));assert.equal(pending.length,3);
  await p.waitForTimeout(1800);
@@ -24,7 +26,7 @@ try{
  assert.ok(await p.evaluate(()=>officeDebug.getCats().filter(c=>['demo-21','demo-22','demo-23'].includes(c.id)).every(c=>c.activity===null&&c.routeLength===0)));
  await p.locator('.cat-label').filter({hasText:'伙伴03'}).click();assert.match(await p.locator('#detail').textContent(),/很长很长/);
  assert.deepEqual(errors,[]);await writeFile('docs/bubbles-qa.json',JSON.stringify({cats:24,unreportedSeated:3,pinned:2,maxOrdinary:3,checks:['queue cap across frames','full hover/click text','stale idle remains available to leisure planner','unreported seats','task update','no browser errors'],errors},null,2));console.log('24-cat bubble and roster browser checks passed');
-}finally{await browser.close();}
+}finally{await browser.close();await isolated.stop();}
 
 // Browser and assertions completed; do not retain driver housekeeping handles.
 process.exit(0);

@@ -31,7 +31,7 @@ def init_roster(source, target):
             row['role']=a['role']
         seen.add(row['id']);clean.append(row)
     if sum(a.get('role')=='lead' for a in clean)>1:raise ValueError('Only one leader allowed')
-    target=Path(target);config=json.loads(target.read_text()) if target.exists() else {'statusUrl':'/api/status','pollIntervalMs':1000,'offlineAfterMinutes':5}
+    target=Path(target);config=json.loads(target.read_text()) if target.exists() else {'statusUrl':'/api/status','pollIntervalMs':1000,'offlineAfterMinutes':30}
     if not isinstance(config,dict): raise ValueError('Config must be an object')
     config['agents']=clean;config['rosterMode']='manual';config.setdefault('staleBecomes','idle');target.parent.mkdir(parents=True,exist_ok=True)
     temp=None
@@ -45,9 +45,13 @@ def init_roster(source, target):
 
 def main():
     parser=argparse.ArgumentParser(); sub=parser.add_subparsers(dest='command',required=True)
+    sub.add_parser('install-launcher'); auto=sub.add_parser('autostart'); auto.add_argument('mode',choices=['on','off'])
     setter=sub.add_parser('set'); setter.add_argument('id'); setter.add_argument('state'); setter.add_argument('task',nargs='?',default=''); setter.add_argument('--name');setter.add_argument('--role',choices=['employee','lead'])
     assigner=sub.add_parser('assign');assigner.add_argument('agent');assigner.add_argument('task');assigner.add_argument('--leader');assigner.add_argument('--event-id');assigner.add_argument('--from',dest='sender');
     sub.add_parser('get');init=sub.add_parser('init');init.add_argument('--from',dest='source',default=str(Path(__file__).resolve().parents[1]/'examples/roster.example.json'));init.add_argument('--config',default=str(Path(__file__).resolve().parents[1]/'app/config.json'));args=parser.parse_args()
+    if args.command in ('install-launcher','autostart'):
+        import launcher
+        print(launcher.install_launcher() if args.command=='install-launcher' else launcher.autostart(args.mode=='on'));return 0
     if args.command=='init':
         try: result=init_roster(args.source,args.config)
         except (OSError,ValueError): print('Invalid roster or config; no valid config was overwritten',file=sys.stderr);return 1
