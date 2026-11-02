@@ -1,13 +1,18 @@
 # 5 分钟接入 / Five-minute setup
 
+> **Demo only:** Never send example cats to the default port 8770: it persists them in the real roster.
+> Start an isolated server in another terminal: `python3 server/server.py --demo --port 8771`.
+> Before running any examples below, run `export CAT_OFFICE_URL=http://127.0.0.1:8771` in the client terminal (and pass this environment to hooks/MCP).
+
+
 Python 3.10+ required. Node 18+ is optional for running the app, required for Node SDK/tests.
 
 ```sh
 npm install && npm start
 # Without Node:
-python3 server/server.py
+python3 server/server.py --demo --port 8771
 ```
-Open http://127.0.0.1:8770/app/ . In another terminal, from repository root:
+Open http://127.0.0.1:8771/app/ . In another terminal, from repository root:
 
 ```sh
 python3 scripts/catctl.py set coder working '写代码中' --name 小橘

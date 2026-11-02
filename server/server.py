@@ -7,7 +7,7 @@ from urllib.parse import urlsplit, unquote
 from status import Store
 ROOT = Path(__file__).resolve().parents[1]
 
-def handler(store, credential='', root=ROOT):
+def handler(store, credential='', root=ROOT, data_dir=None):
     class Handler(SimpleHTTPRequestHandler):
         def __init__(self, *args, **kwargs): super().__init__(*args, directory=str(root), **kwargs)
         def log_message(self, *_): pass  # Never log request bodies or authorization.
@@ -43,7 +43,7 @@ def handler(store, credential='', root=ROOT):
             if path in ('/api/status','/api/roster','/api/assignments','/api/assign'):
                 if not self.authorized(): return self.reply(401, {'error':'Authorization required'})
                 return self.reply(200, store.snapshot())
-            if path == '/api/health': return self.reply(200, {'ok':True,'authentication':bool(credential)})
+            if path == '/api/health': return self.reply(200, {'ok':True,'authentication':bool(credential),'root':str(root.resolve()),'dataDir':str(Path(data_dir).resolve()) if data_dir else None,'pid':os.getpid()})
             if path == '/':
                 self.send_response(302); self.send_header('Location','/app/'); self.end_headers(); return
             # Expose only public application assets, never repository, state, or configuration overrides.
@@ -89,7 +89,7 @@ def main():
         store.push({**old,**leader,'state':old.get('state','idle')})
     seed=ROOT/'examples'/'status.json'
     if args.demo and seed.exists(): store.push(json.loads(seed.read_text()))
-    server=ThreadingHTTPServer(('127.0.0.1',args.port),handler(store,os.environ.get('CAT_OFFICE_TOKEN','')))
+    server=ThreadingHTTPServer(('127.0.0.1',args.port),handler(store,os.environ.get('CAT_OFFICE_TOKEN',''),data_dir=None if args.demo else args.data_dir))
     print(f'Little Cat Office: http://127.0.0.1:{args.port}/app/',flush=True)
     try: server.serve_forever()
     except KeyboardInterrupt: pass

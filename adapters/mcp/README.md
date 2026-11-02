@@ -1,5 +1,10 @@
 # MCP stdio adapter
 
+> **Demo only:** Never send example cats to the default port 8770: it persists them in the real roster.
+> Start an isolated server in another terminal: `python3 server/server.py --demo --port 8771`.
+> Before running any examples below, run `export CAT_OFFICE_URL=http://127.0.0.1:8771` in the client terminal (and pass this environment to hooks/MCP).
+
+
 Start `python3 adapters/mcp/server.py` from any directory. Configure a stdio MCP client with command `python3`, args `[/absolute/path/to/little-cat-office/adapters/mcp/server.py]`, and the same optional authentication environment as the office.
 
 Tool: `set_status({"id":"coder","state":"need_you","task":"需要确认"})`.

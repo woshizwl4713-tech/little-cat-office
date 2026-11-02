@@ -1,5 +1,10 @@
 # Codex adapter: explicit instruction-driven reporting
 
+> **Demo only:** Never send example cats to the default port 8770: it persists them in the real roster.
+> Start an isolated server in another terminal: `python3 server/server.py --demo --port 8771`.
+> Before running any examples below, run `export CAT_OFFICE_URL=http://127.0.0.1:8771` in the client terminal (and pass this environment to hooks/MCP).
+
+
 Add the following to the target project's AGENTS.md, replacing `OFFICE_REPO` with the actual checkout path. This is an instruction convention, **not automatic global event interception or a tested Codex hooks API**.
 
 > At task start, run `python3 "$OFFICE_REPO/scripts/catctl.py" set coder working "正在处理任务"`. Before asking for human confirmation, report `need_you`. After completing the turn, report `idle`. On long tasks send periodic working updates before the configured timeout (30 minutes by default). If reporting fails, report the failure without blocking the user's actual task. Never include credentials, full prompts, or confidential content in status text.

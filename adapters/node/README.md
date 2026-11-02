@@ -1,5 +1,10 @@
 # Node SDK (Node 18+)
 
+> **Demo only:** Never send example cats to the default port 8770: it persists them in the real roster.
+> Start an isolated server in another terminal: `python3 server/server.py --demo --port 8771`.
+> Before running any examples below, run `export CAT_OFFICE_URL=http://127.0.0.1:8771` in the client terminal (and pass this environment to hooks/MCP).
+
+
 ```js
 import { report } from './adapters/node/index.mjs';
 await report('working');
