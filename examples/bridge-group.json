@@ -1,0 +1,1 @@
+{"type":"group","id":"demo-group-001","from":{"id":"primary","name":"主持猫"},"to":[{"id":"a","name":"写作猫"},{"id":"b","name":"设计猫"},{"id":"c","name":"审核猫"}],"task":"讨论本周资料"}

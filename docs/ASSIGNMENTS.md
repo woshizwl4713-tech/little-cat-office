@@ -45,3 +45,7 @@ MCP 增加 assign_task 工具，参数与 /api/assign 相同。该工具只可�
 派工队列、完成标记与名册在同一 SQLite 事务提交。最多保留最近 1000 条成员会面记录，最多 200 条待办；超过队列容量会拒绝，不静默丢弃。幂等识别限保留记录范围。重复心跳不重演已完成会面。页面关闭期间待办保留，重新打开后继续；完成回执只是动画结束，不是替用户批准工作成果。更换/删除领导或删除接收者会取消不再有效的待办。
 
 测试：`npm run test:assignments`。证据：docs/group-assign-qa.json、docs/assignments-qa.json、docs/shot_assign_three.png。
+
+## 自动事件桥 / Automatic event bridge
+
+Grok Bot、Codex、Claude 与本地 runner 可通过 JSON 事件自动触发派工、召唤和群聊会面，无需点击分配。见 [一分钟接入与隔离 demo](BRIDGE.md)。

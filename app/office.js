@@ -123,9 +123,55 @@ box(29,.42,.22,cream,0,.28,13.05);
 box(.06,3.2,18,softR,14.55,1.7,-1);}
 // Ceiling only over back half so near camera stays open sky feel
 const ceil=mesh(new THREE.PlaneGeometry(29,16),ceilMat,0,7.5,-2);ceil.rotation.x=Math.PI/2;ceil.castShadow=false;ceil.visible=false;
-const outsideMat=new THREE.MeshBasicMaterial({color:'#c9dcd6',side:THREE.DoubleSide});
-// A soft illustrated skyline keeps the background in the toy-office palette.
-const skyline=document.createElement('canvas');skyline.width=1024;skyline.height=512;const sky=skyline.getContext('2d');const gradient=sky.createLinearGradient(0,0,0,512);gradient.addColorStop(0,'#c1dcd8');gradient.addColorStop(1,'#fff0d4');sky.fillStyle=gradient;sky.fillRect(0,0,1024,512);for(let i=0;i<28;i++){const h=70+(i*73)%220;sky.fillStyle=i%2?'#b7c9c3':'#a5bdb7';sky.fillRect(i*40,512-h,30,h);sky.fillStyle='#e9ead4';for(let y=512-h+16;y<500;y+=25)sky.fillRect(i*40+8,y,5,10);}outsideMat.map=new THREE.CanvasTexture(skyline);outsideMat.map.colorSpace=THREE.SRGBColorSpace;
+// Illustrated city panorama: fixed architecture, changing sky, glass and occupancy lights.
+// Keep this unlit so interior exposure does not wash out the night skyline.
+const outsideMat=new THREE.MeshBasicMaterial({color:0xffffff,side:THREE.DoubleSide,toneMapped:false});
+const skyline=document.createElement('canvas');skyline.width=2048;skyline.height=768;
+const sky=skyline.getContext('2d');
+outsideMat.map=new THREE.CanvasTexture(skyline);outsideMat.map.colorSpace=THREE.SRGBColorSpace;
+let cityTime=null;
+function drawCity(mode){
+ if(cityTime===mode)return;cityTime=mode;
+ const palettes={
+  day:{sky:['#529fce','#b5e2ed','#f2e9d7'],far:'#8cabbc',body:'#49788f',side:'#35586f',glass:['#80c0d6','#a8d6e1','#659eb9'],line:'#47758c'},
+  evening:{sky:['#665d99','#d99baf','#ffcf91'],far:'#88788f',body:'#54576f',side:'#3d405b',glass:['#bb939f','#dcafaa','#77778f'],line:'#51566e'},
+  night:{sky:['#101d3c','#233957','#526278'],far:'#34465e',body:'#24394f',side:'#182b40',glass:['#304e66','#3b5e76','#29465f'],line:'#22374d'}
+ };
+ const p=palettes[mode],g=sky.createLinearGradient(0,0,0,768);
+ p.sky.forEach((c,i)=>g.addColorStop(i/2,c));sky.fillStyle=g;sky.fillRect(0,0,2048,768);
+ if(mode==='night'){
+  sky.fillStyle='#c7dce6';for(let i=0;i<48;i++){const x=(i*293+51)%2048,y=(i*79+23)%270;sky.globalAlpha=.35+(i%3)*.2;sky.fillRect(x,y,2,2);}sky.globalAlpha=1;
+ }
+ // Soft sun/moon disk and a few long, stylized cloud wisps.
+ sky.fillStyle=mode==='night'?'#e4e9cf':mode==='evening'?'#ffe0a3':'#fff4d4';
+ sky.beginPath();sky.arc(1530,mode==='evening'?295:116,mode==='night'?25:42,0,Math.PI*2);sky.fill();
+ if(mode!=='night'){sky.fillStyle=mode==='day'?'#e7f5f5':'#edb6b8';sky.globalAlpha=.48;for(let i=0;i<6;i++){sky.beginPath();sky.ellipse(140+i*360,90+(i%3)*48,110,9,0,0,Math.PI*2);sky.fill();}sky.globalAlpha=1;}
+ // Distant skyline between the taller neighboring towers.
+ sky.fillStyle=p.far;for(let i=0;i<36;i++){const h=100+(i*71)%210;sky.fillRect(i*60,768-h,45,h);sky.fillRect(i*60+10,758-h,25,10);}
+ const towers=[[-50,190,520],[170,148,385],[350,205,610],[590,135,430],[760,185,550],[1005,155,340],[1200,210,475],[1450,145,390],[1650,190,580],[1885,185,455]];
+ towers.forEach(([x,w,h],i)=>{
+  const top=768-h,side=22;
+  sky.fillStyle=p.side;sky.fillRect(x,top,w,h);
+  sky.fillStyle=p.body;sky.fillRect(x,top,w-side,h);
+  // Rooftop crown and occasional slender antenna give recognizable tower silhouettes.
+  sky.fillStyle=p.side;sky.fillRect(x+18,top-12,w-48,12);
+  if(i%3===2)sky.fillRect(x+w*.5,top-43,3,31);
+  for(let row=0,y=top+15;y<768;y+=25,row++)for(let col=0,xx=x+9;xx<x+w-side-8;xx+=19,col++){
+   const seed=(i*37+row*13+col*7)%19;
+   const lit=mode==='night'?seed<11:mode==='evening'?seed<4:false;
+   sky.fillStyle=lit?['#ffda8f','#efb86b','#f8e8bb'][seed%3]:p.glass[(col+Math.floor(row/5)+i)%3];
+   sky.fillRect(xx,y,12,17);
+  }
+  // Broad diagonal reflections stay clipped to the glass facade.
+  sky.save();sky.beginPath();sky.rect(x+5,top+8,w-side-10,h-8);sky.clip();
+  sky.globalAlpha=mode==='day'?.19:mode==='evening'?.12:.035;sky.fillStyle='#ffffff';
+  sky.beginPath();sky.moveTo(x+w*.6,top);sky.lineTo(x+w*.95,top);sky.lineTo(x+w*.35,768);sky.lineTo(x,768);sky.closePath();sky.fill();sky.restore();
+  sky.fillStyle=p.line;for(let y=top+114;y<768;y+=125)sky.fillRect(x,y,w-side,4);
+  sky.fillStyle=mode==='day'?'#b5d8e1':mode==='evening'?'#d6a4a4':'#597487';sky.fillRect(x,top,2,h);
+ });
+ outsideMat.map.needsUpdate=true;
+}
+drawCity('day');
 mesh(new THREE.PlaneGeometry(29,7.6),outsideMat,0,3.7,-12.85);mesh(new THREE.PlaneGeometry(10,7.6),outsideMat,19,3.7,-12.85);for(let x=14.5;x<=24;x+=3.2)box(.12,7.6,.14,frameForBoss(),x,3.7,-12.55);function frameForBoss(){return mat('#ebe6d4',.4)}const sideVista=mesh(new THREE.PlaneGeometry(26,7.6),outsideMat,-14.65,3.7,.2);sideVista.rotation.y=Math.PI/2;
 const frame=mat('#ebe6d4',.4);for(let x=-14.5;x<=14.6;x+=3.625)box(.12,7.6,.14,frame,x,3.7,-12.55);for(let z=-12.5;z<=13.1;z+=3.65)box(.14,7.6,.12,frame,-14.5,3.7,z);
 for(const y of [.18,2.2,7.35]){box(29,.14,.18,frame,0,y,-12.55);box(.18,.14,26,frame,-14.5,y,.2)}
@@ -410,7 +456,7 @@ $('#simulation').addEventListener('change',e=>{simulation=e.target.checked;clear
 document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));renderUI()});
 let timeMode='day';const lighting={day:{sky:0xfff4e0,ground:0xa8d8c8,sun:0xffe8c0,intensity:2.1,ambient:1.8,exposure:1.0,bg:'radial-gradient(ellipse at 48% 38%,#fff8ec,#dff2e8 55%,#d0ebe2)'},evening:{sky:0xffe0c4,ground:0x9aab92,sun:0xffc08a,intensity:3.3,ambient:2.0,exposure:1.22,bg:'radial-gradient(ellipse at 48% 40%,#f6e7d2,#dde3cf)'},night:{sky:0xb4c8e2,ground:0x6a7872,sun:0xb7d2ef,intensity:1.05,ambient:1.65,exposure:1.18,bg:'radial-gradient(ellipse at 48% 40%,#627882,#3d545c)'}};
 const nightLights=[];for(const [x,z]of [[-10,-8],[-1,-8],[8,-8],[-6,4],[7,3],[7,10]]){const l=new THREE.PointLight('#ffd49c',0,15,2);l.position.set(x,4,z);scene.add(l);nightLights.push(l)}
-function setTime(mode){timeMode=mode;const hour=new Date().getHours();const actual=mode==='now'?(hour>=7&&hour<17?'day':hour>=17&&hour<20?'evening':'night'):mode;const l=lighting[actual];ambient.color.set(l.sky);ambient.groundColor.set(l.ground);ambient.intensity=l.ambient;sun.color.set(l.sun);sun.intensity=l.intensity;sun.position.set(actual==='evening'?-25:-10,actual==='evening'?12:26,-12);renderer.toneMappingExposure=l.exposure;renderer.shadowMap.needsUpdate=true;host.style.background=l.bg;nightLights.forEach(x=>x.intensity=actual==='night'?28:actual==='evening'?5:0);document.querySelectorAll('[data-time]').forEach(b=>{const active=b.dataset.time===mode;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))})}
+function setTime(mode){timeMode=mode;const hour=new Date().getHours();const actual=mode==='now'?(hour>=7&&hour<17?'day':hour>=17&&hour<20?'evening':'night'):mode;const l=lighting[actual];drawCity(actual);ambient.color.set(l.sky);ambient.groundColor.set(l.ground);ambient.intensity=l.ambient;sun.color.set(l.sun);sun.intensity=l.intensity;sun.position.set(actual==='evening'?-25:-10,actual==='evening'?12:26,-12);renderer.toneMappingExposure=l.exposure;renderer.shadowMap.needsUpdate=true;host.style.background=l.bg;nightLights.forEach(x=>x.intensity=actual==='night'?28:actual==='evening'?5:0);document.querySelectorAll('[data-time]').forEach(b=>{const active=b.dataset.time===mode;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))})}
 document.querySelectorAll('[data-time]').forEach(b=>b.onclick=()=>setTime(b.dataset.time));
 function resize(){const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h);camera.aspect=w/Math.max(1,h);updateCamera()}
 new ResizeObserver(resize).observe(host);function setZoom(v){zoom=Math.max(.55,Math.min(2.4,v));updateCamera();resize()}$('#zoom-in').onclick=()=>setZoom(zoom+.12);$('#zoom-out').onclick=()=>setZoom(zoom-.12);$('#reset-view').onclick=()=>{viewAngle=.30;viewHeight=10.8;camRadius=24;zoom=1;target.set(2,1,-1);window.__userFramed=false;updateCamera();resize()};host.addEventListener('wheel',e=>{if(e.target!==renderer.domElement)return;e.preventDefault();setZoom(zoom-e.deltaY*.0007)},{passive:false});

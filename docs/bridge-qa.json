@@ -1,0 +1,8 @@
+{
+  "automaticDispatcherLeadership": true,
+  "recipients": 3,
+  "allMetTogether": true,
+  "meetingMs": 5032,
+  "returnedWorking": true,
+  "errors": []
+}
